@@ -1,5 +1,5 @@
 import { response } from "express";
-import { ApiResponse } from "../utils/api-respons";
+import { ApiResponse } from "../utils/api-respons.js";
 
 const healthCheck = (req, res) => {
   // There can be cases when there can be error so let's use try catch

@@ -4,7 +4,7 @@ import cors from "cors";
 
 const app = express();
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Welcome to basecampy!");
 });
 
 // Explaining the above code in our terms
@@ -37,5 +37,14 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+// usually importing of healthcheck is done after the configuration of everything
+// In video place is little bit different
+// import routes
+// BE CAREFUL WHILE IMPORTING IT FROM ROUTES ONLY AND YOU CAN CLICK ON healthCheckRouter WHILE PRESING CTRL TO SEE WHERE IT IS FROM
+import healthCheckRouter from "./routes/healthcheck.routes.js";
+// where we want to serve it is healthcheck router by use another syntax of middleware
+// Once someone will hit this url then then below healthCheckRouter will take over
+app.use("/api/v1/healthcheck", healthCheckRouter);
 
 export default app;
