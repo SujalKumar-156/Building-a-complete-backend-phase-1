@@ -98,5 +98,14 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
+// See carefull it's methods not method which is a property
+// isPasswordCorrect name by us and use function not arrow function
+userSchema.methods.isPasswordCorrect = async function (password) {
+  //  I just have to ask bcrypt to compare the hash of the argument to the database password which can be accessed via this.password
+  // and it takes time
+  // True or false
+  return await bcrypt.compare(password, this.password);
+};
+
 //  This User will be converted to lower case user
 export const User = mongoose.model("User", userSchema);
