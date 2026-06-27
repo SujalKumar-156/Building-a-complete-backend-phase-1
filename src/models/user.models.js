@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 //                      Object has to passed in it
 const userSchema = new Schema(
@@ -107,5 +108,36 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
+// Now we 2 things to do first to generate access token then generate the refresh token
+userSchema.methods.generateAccessToken = function () {
+  // it's simply a method which takes some the parameters format of object
+  return jwt.sign(
+    {
+      // We can see _id in mongodb
+      _id: this._id, //id is more than enough for payload and then we can query the db
+      // but just to exxagerate if we want to store the email
+      email: this.email,
+      username: this.username,
+      // now we have to provide the secret if we don't then it will just use the default one which is not good
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    // THEN THE TIME PERIOD I THE FORM OF OBJECT
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+  );
+};
+// Now refresh token
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      // 1st step is always payload in refresh we don't usualy give so much payload
+      _id: this._id,
+    },
+    // now provide secret
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
+  );
+};
 //  This User will be converted to lower case user
 export const User = mongoose.model("User", userSchema);
