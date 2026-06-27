@@ -1,5 +1,53 @@
 import { text } from "express";
 import Mailgen from "mailgen";
+import nodemailer from "nodemailer";
+
+// SENDING EMAIL
+const sendEmail = async (options) => {
+  // this is just putting up the branding from mailgen
+  const mailGenerator = new Mailgen({
+    theme: "default",
+    product: {
+      name: "Task Manager",
+      link: "https://taskmanagerlink.com", //this doesn't exist
+    },
+  });
+  // plaintext is for the case that might the client does not support html
+  const emailTextutal = mailGenerator.generatePlaintext(options.mailgenContent);
+  // this will generate html
+  const emailHtml = mailGenerator.generate(options.mailgenContent);
+
+  // NOW THE SENDING PART
+  // this is a transporter object it'll take the email and sent
+  const transporter = nodemailer.createTransport({
+    host: process.env.MAILTRAP_SMTP_HOST,
+    port: process.env.MAILTRAP_SMTP_PORT,
+    auth: {
+      user: process.env.MAILTRAP_SMTP_USER,
+      pass: process.env.MAILTRAP_SMTP_PASS,
+    },
+  });
+  // To configure the next story we have to go to nodemailer website
+
+  const mail = {
+    from: "mail.taskmanager@example.com",
+    to: options.email,
+    subject: options.subject,
+    text: emailTextutal,
+    html: emailHtml,
+    // If the client supports the text it will show text
+    // If the client supports the html it'll show the html
+  };
+
+  try {
+    await transporter.sendMail(mail);
+  } catch (error) {
+    console.error(
+      "Email service failed silently, Make sure credentials provided are valid",
+    );
+    console.error("Error: ", error);
+  }
+};
 
 // Generating email
 const emailVerificationMailgenContent = (username, verificationUrl) => {
@@ -45,4 +93,8 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
   };
 };
 
-export { emailVerificationMailgenContent, forgotPasswordMailgenContent };
+export {
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
+  sendEmail,
+};
