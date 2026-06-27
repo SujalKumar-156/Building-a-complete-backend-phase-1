@@ -47,4 +47,8 @@ import healthCheckRouter from "./routes/healthcheck.routes.js";
 // Once someone will hit this url then then below healthCheckRouter will take over
 app.use("/api/v1/healthcheck", healthCheckRouter);
 
+import authRouter from "./routes/auth.routes.js";
+app.use("/api/v1/auth", authRouter);
+// IN this we remove the healthcheck and just added the auth instead of that because in prd
+
 export default app;

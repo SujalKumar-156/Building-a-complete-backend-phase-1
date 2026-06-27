@@ -6,7 +6,7 @@
 // userverification => email
 // send response back to the request
 
-import { User } from "../models/user.models";
+import { User } from "../models/user.models.js";
 import { ApiResponse } from "../utils/api-respons.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";

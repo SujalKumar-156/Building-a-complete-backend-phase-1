@@ -69,8 +69,6 @@ const emailVerificationMailgenContent = (username, verificationUrl) => {
     },
   };
 };
-import { text } from "express";
-import Mailgen from "mailgen";
 
 // FOrgot Password
 const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
