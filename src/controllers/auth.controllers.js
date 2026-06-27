@@ -10,6 +10,7 @@ import { User } from "../models/user.models";
 import { ApiResponse } from "../utils/api-respons.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { emailVerificationMailgenContent, sendEmail } from "../utils/mail.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -66,4 +67,39 @@ const registerUser = asyncHandler(async (req, res) => {
   // Now we should save the user
   await user.save({ validateBeforeSave: false });
   // Now on server side is done now i need to send an email so that same token can be sent to user itself that's the final part
+  await sendEmail({
+    email: user?.email,
+    subject: "Please verify your email",
+    mailgenContent: emailVerificationMailgenContent(
+      user.username,
+      //   For link it would be different in the cases of being deployed on vercel and localhost
+      //   Generating dynamic link
+      `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unhashedToken}`,
+    ),
+  });
+  // We don't need to send whole amount of data
+  const createdUser = await User.findById(user._id).select(
+    // takes string
+    // means remove password removes refreshToken
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
+  if (!createdUser) {
+    throw new ApiError(
+      500,
+      "Something went wrong while registering the user",
+      [],
+    );
+  }
+  // Now we can send the response to user
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        200,
+        { user: createdUser },
+        "User registered successfully and verification email has been sent on you email",
+      ),
+    );
 });
+
+export { registerUser };
