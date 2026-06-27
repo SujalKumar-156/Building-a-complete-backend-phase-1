@@ -65,7 +65,7 @@ const userSchema = new Schema(
     forgotPasswordExpiry: {
       type: Date,
     },
-    // SO that user needs to done in specific time period not like in 10 days
+    // So that user needs to done in specific time period not like in 10 days
     emailVerificationToken: {
       type: String,
     },
