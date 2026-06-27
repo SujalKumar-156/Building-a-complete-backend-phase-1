@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import crypto from "crypto";
 //                      Object has to passed in it
 const userSchema = new Schema(
   // First object is all the fields and 2nd object is having things like timeseries and timestamps etc.
@@ -139,5 +139,24 @@ userSchema.methods.generateRefreshToken = function () {
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRY },
   );
 };
+
+// Now w/o data, these are temporary tokens and these are used for
+// these purposes verifying the user and password resetters
+
+// Just generating long string
+userSchema.methods.generateTemporaryToken = function () {
+  // crypto generates the value in hex so we need to convert it in string
+  const unhashedToken = crypto.randomBytes(20).toString("hex");
+  // This token will be stored in db for little bit of time
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(unhashedToken)
+    .digest("hex"); // Now we also need to work on the token expiry
+  // Whenever we use this method in any controller this will return this data and in that controller we will go and store this data
+  const tokenExpiry = Date.now() + 20 * 60 * 1000; //20 mins
+  // I am not sure who will be using what value so we'll be returning whole
+  return { unhashedToken, hashedToken, tokenExpiry };
+};
+
 //  This User will be converted to lower case user
 export const User = mongoose.model("User", userSchema);
