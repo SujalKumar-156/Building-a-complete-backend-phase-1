@@ -42,7 +42,7 @@ const userSchema = new Schema(
     },
     fullName: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     password: {
@@ -85,18 +85,18 @@ const userSchema = new Schema(
 // We will use becrypt in pre stage to hash the password, we will pre (hook) to userSchema and i wanted to attach whenever the save operation is performed adn wht to do and perform function not arrow function here because we will need the context of it
 //  Ans we will be suing async function
 // passed next to tell my work is done go ahead and perform the next work
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // BY this safeguard this below mechanism will only work if we are ,modifying the password field or the first time and when we are changing the password
   // This helps us from the case when we are not changing the password
   // If we are changing the password we want to hash it and if we are saving the password we want to hash it
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
   // i just want to access 1 field and encrypt it
   // await is because it would take time
   // we will be using hash from many methods and
   // we have to tell 2 things how many what does the data we want to hash and how many round we want to apply
   this.password = await bcrypt.hash(this.password, 10);
   // We are overwriting the password
-  next();
+  // No next parameter is need in async and await
 });
 
 // See carefull it's methods not method which is a property

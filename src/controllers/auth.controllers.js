@@ -33,7 +33,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   // order doesn't matter
-  const { email, username, password, role } = req.body;
+  const { fullName, email, username, password, role } = req.body;
 
   // check inn db if user exists
   const existedUser = await User.findOne({
@@ -45,6 +45,7 @@ const registerUser = asyncHandler(async (req, res) => {
   //   What if we don't find a new user
   // Since these are db operation so use await
   const user = await User.create({
+    fullName,
     email,
     password,
     username,
