@@ -2,6 +2,9 @@ import express from "express";
 import cors from "cors";
 // cors is something which needs to handle in backend
 
+// Since all the express related stuff happening in here we will use cookie parser here
+import cookieParser from "cookie-parser";
+
 const app = express();
 app.get("/", (req, res) => {
   res.send("Welcome to basecampy!");
@@ -23,6 +26,8 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 // We want to serve static assests from the images folder in public
 app.use(express.static("public"));
 // Now we can serve images
+
+app.use(cookieParser());
 
 // CORS configuration now
 app.use(

@@ -1,6 +1,6 @@
 // Initial boilerplate is same
 import { Router } from "express";
-import { registerUser } from "../controllers/auth.controllers.js";
+import { login, registerUser } from "../controllers/auth.controllers.js";
 import { userRegisterValidator } from "../validators/index.js";
 import { validate } from "../middlewares/validator.middlewares.js";
 
@@ -17,4 +17,5 @@ router
   ); // since req s going from a to b i.e reached to server route now waiting t be used by user registration
 // And we want to intercept in between
 
+router.route("/register").post(login);
 export default router;

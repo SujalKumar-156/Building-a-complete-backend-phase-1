@@ -103,4 +103,58 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
-export { registerUser };
+// We need to design the strategy that we suppor username based login or email based login
+const login = asyncHandler(async (req, res) => {
+  const { email, password, username } = req.body;
+  if (
+    /*!username ||*/ !email
+  ) // we will proceed with only email just to avoid the cvonfusion
+  {
+    throw new ApiError(400, "Username or email is required");
+  }
+  //db operation use await
+  const user = await User.findOne({ email });
+  if (!user) throw new ApiError(400, "User does not exists");
+
+  const isPasswordValid = user.isPasswordCorrect(password); //user is sending the pass
+
+  if (!isPasswordValid) throw new ApiError(400, "Invalid credentials");
+
+  // In our case we used tokens in both the cases for registration and login
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id,
+  );
+
+  // Now we want to send some data/token in cookies
+  //  We have access to user from above line 116 but it has all the unneccesarry fields like password refreshtoken and all
+  // So, we'll be copy pasting code of above another part
+
+  const loggedInUser = await User.findById(user._id).select(
+    // takes string
+    // means remove password removes refreshToken
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
+  // we already checked the user is existed or not so we don't need to check this
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: " loggedInUser",
+          accessToken,
+          refreshToken,
+        },
+        "User logged in successfully",
+      ),
+    );
+});
+
+export { registerUser, login };
