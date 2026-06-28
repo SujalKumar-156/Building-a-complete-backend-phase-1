@@ -55,7 +55,7 @@ const userSchema = new Schema(
       default: false,
     },
     // We'll also use token systems JWT so we need to keep 1 token in db
-    refereshToken: {
+    refreshToken: {
       type: String,
     },
     forgotPasswordToken: {
